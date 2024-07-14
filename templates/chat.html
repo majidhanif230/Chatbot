@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <div class="left-icons">
+                <img src="{{ url_for('static', filename='sign-in.jpg') }}" alt="Sign In">
+                <img src="{{ url_for('static', filename='forward.jpg') }}" alt="Forward">
+            </div>
+            <div class="center-logo">
+                <h1>My App</h1>
+            </div>
+            <div class="right-icons">
+                <img src="{{ url_for('static', filename='printer.png') }}" alt="Print">
+                <img src="{{ url_for('static', filename='night.png') }}" alt="Night Mode" id="mode-icon" onclick="toggleMode()">
+            </div>
+        </div>
+
+        <div id="chat-box">
+            <!-- Messages will be appended here -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: userInput})
+            });
+            const data = await response.json();
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // Append user message
+            document.getElementById('chat-box').innerHTML += `<div class="message user-message"><span>${userInput}</span><div class="timestamp">${time}</div></div>`;
+            
+            // Append AI response message
+            document.getElementById('chat-box').innerHTML += `<div class="message ai-message"><span>${data.message}</span><div class="timestamp">${time}</div></div>`;
+            
+            document.getElementById('user-input').value = '';
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+    </script>
+</body>
+</html>
